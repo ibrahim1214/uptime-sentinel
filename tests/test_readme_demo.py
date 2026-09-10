@@ -36,6 +36,26 @@ def test_examples_sites_yaml_exists_and_matches_readme():
     assert "Internal Payments API (staging)" in content
 
 
+def test_examples_sites_yaml_is_actually_tracked_by_git():
+    """Regression guard: .gitignore's `sites.yaml` rule once also matched
+    examples/sites.yaml, so the demo config the README points readers at
+    silently never made it into the pushed repo. If a .git directory is
+    present, confirm the file is tracked rather than just present on disk.
+    """
+    if not (PROJECT_ROOT / ".git").is_dir():
+        pytest.skip("not running from a git checkout")
+    result = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", "examples/sites.yaml"],
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, (
+        "examples/sites.yaml exists on disk but is not tracked by git "
+        "(check .gitignore for an overly broad 'sites.yaml' rule)"
+    )
+
+
 @pytest.mark.network
 def test_demo_scenario_reflects_real_network_state(tmp_path):
     """Requires real network access (hits https://example.com)."""

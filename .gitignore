@@ -8,6 +8,7 @@ venv/
 build/
 dist/
 *.db
-sites.yaml
+/sites.yaml
 !sites.example.yaml
+!examples/sites.yaml
 .DS_Store

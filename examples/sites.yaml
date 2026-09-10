@@ -1,0 +1,12 @@
+# The exact config used in the README's "Live demo" section.
+# "Internal Payments API (staging)" deliberately points at a closed local
+# port so the failure/alerting path has something real to demonstrate too.
+db_path: demo.db
+sites:
+  - name: Company Homepage
+    url: https://example.com
+    expected_status: 200
+    timeout: 10
+  - name: Internal Payments API (staging)
+    url: http://127.0.0.1:1
+    timeout: 2
