@@ -51,28 +51,39 @@ sentinel report
 sentinel report -o report.md
 ```
 
-Example `sentinel check` output:
+## Live demo
 
+Real output, not a mockup — this is `examples/sites.yaml` in this repo (one genuinely reachable site, one deliberately pointed at a closed local port so the failure case is real too), run twice with `sentinel check` and then `sentinel report`:
+
+```bash
+cd examples
+sentinel check --config sites.yaml
 ```
-[OK  ] My Website              142ms  https://example.com
-[FAIL] My API health check      n/a   https://api.example.com/health
-         -> HTTPSConnectionPool(host='api.example.com', port=443): Read timed out.
+```
+[OK  ] Company Homepage        415ms  https://example.com
+[FAIL] Internal Payments API (staging)      n/a  http://127.0.0.1:1
+         -> HTTPConnectionPool(host='127.0.0.1', port=1): Max retries exceeded with url: /
+         (Caused by NewConnectionError('...: Failed to establish a new connection: [Errno 111] Connection refused'))
 
-1/2 sites healthy. 1 alert(s) sent.
+1/2 sites healthy. 0 alert(s) sent.
 ```
 
-Example report (`sentinel report`):
-
+```bash
+sentinel check --config sites.yaml   # run again a moment later
+sentinel report --config sites.yaml
+```
 ```
 # Uptime Report
 
-_Generated 2026-09-11T02:00:00+00:00_
+_Generated 2026-09-10T19:29:41+00:00_
 
 | Site | Uptime | Avg Latency | Incidents | Checks | Last Status |
 |---|---|---|---|---|---|
-| My Website | 100.0% | 138.2 ms | 0 | 288 | up |
-| My API health check | 97.2% | 210.5 ms | 3 | 288 | up |
+| Company Homepage | 100.0% | 435.3 ms | 0 | 2 | up |
+| Internal Payments API (staging) | 0.0% | n/a | 1 | 2 | DOWN (Connection refused) |
 ```
+
+`0 alert(s) sent` on both runs is correct, not a bug: the very first check of a site only establishes a baseline (nothing to transition *from* yet), and the second check found no state change either. Point `sentinel monitor` at these same sites and take one of them offline mid-run and you'll see exactly one alert fire, the moment it flips — not one per failed check.
 
 ### Running it on a schedule
 
@@ -92,6 +103,7 @@ uptime_sentinel/
 ├── alerts.py    # transition-only alerting, console or webhook delivery
 ├── report.py    # renders a Markdown uptime report from history
 └── cli.py       # `sentinel check|monitor|report`
+examples/sites.yaml   # the exact config used in the Live demo above
 ```
 
 ## Testing
