@@ -1,0 +1,17 @@
+# Copy this to sites.yaml and edit for your own sites.
+db_path: uptime_sentinel.db
+
+# Optional: a Slack (or any Slack-compatible) incoming webhook URL.
+# Leave blank to just log alerts to the console instead -- no account needed.
+webhook_url: ""
+
+sites:
+  - name: My Website
+    url: https://example.com
+    expected_status: 200
+    timeout: 10
+
+  - name: My API health check
+    url: https://api.example.com/health
+    expected_status: 200
+    timeout: 5
